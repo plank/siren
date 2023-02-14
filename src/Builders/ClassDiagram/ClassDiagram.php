@@ -8,8 +8,8 @@ use Plank\Siren\Builders\ClassDiagram\Exceptions\RelationException;
 class ClassDiagram
 {
     /**
-     * @param array<UmlClass> $classes
-     * @param array<Relation> $relations
+     * @param  array<UmlClass>  $classes
+     * @param  array<Relation>  $relations
      */
     public function __construct(
         protected ?string $title = null,

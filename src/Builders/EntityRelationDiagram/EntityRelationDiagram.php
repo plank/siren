@@ -8,8 +8,8 @@ use Plank\Siren\Builders\EntityRelationDiagram\Exceptions\RelationException;
 class EntityRelationDiagram
 {
     /**
-     * @param array<Entity> $entities
-     * @param array<Relation> $relations
+     * @param  array<Entity>  $entities
+     * @param  array<Relation>  $relations
      */
     public function __construct(
         protected ?string $title = null,
