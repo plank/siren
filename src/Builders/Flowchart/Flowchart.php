@@ -54,7 +54,7 @@ class Flowchart
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -84,7 +84,7 @@ class Flowchart
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -103,7 +103,7 @@ class Flowchart
 
         $subgraph->setParent($this);
         $subgraph->indent($this->level + 1);
-        
+
         $this->subgraphs[$subgraph->id] = $subgraph;
 
         $subgraph->validate();
@@ -118,7 +118,7 @@ class Flowchart
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -144,19 +144,19 @@ class Flowchart
     public function validateElements()
     {
         if ($duplicates = $this->duplicates($this->elements(), fn (Node|Subgraph $node) => $node->id)) {
-            throw new SubgraphException("The following Nodes collide in the graphs. [".implode(', ', $duplicates).']');
+            throw new SubgraphException('The following Nodes collide in the graphs. ['.implode(', ', $duplicates).']');
         }
     }
 
     public function validateLinks()
     {
         if ($duplicates = $this->duplicates($this->links(), fn (Link $link) => trim((string) $link))) {
-            throw new SubgraphException("The following Links collide in the graphs. [".implode(', ', $duplicates).']');
+            throw new SubgraphException('The following Links collide in the graphs. ['.implode(', ', $duplicates).']');
         }
     }
 
     protected function duplicates(array $items, callable $identifier): array
-    {   
+    {
         $mapped = array_map($identifier, $items);
         sort($mapped);
 
