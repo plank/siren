@@ -46,39 +46,13 @@ class Link
         );
     }
 
-    public function solid(): self
+    public function line(Line $line)
     {
         return new self(
             $this->src,
             $this->dest,
             $this->srcArrow,
-            Line::SOLID,
-            $this->destArrow,
-            $this->text,
-            $this->minimumLength
-        );
-    }
-
-    public function dotted(): self
-    {
-        return new self(
-            $this->src,
-            $this->dest,
-            $this->srcArrow,
-            Line::DOTTED,
-            $this->destArrow,
-            $this->text,
-            $this->minimumLength
-        );
-    }
-
-    public function thick(): self
-    {
-        return new self(
-            $this->src,
-            $this->dest,
-            $this->srcArrow,
-            Line::THICK,
+            $line,
             $this->destArrow,
             $this->text,
             $this->minimumLength
