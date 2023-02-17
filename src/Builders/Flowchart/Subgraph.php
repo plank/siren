@@ -61,7 +61,7 @@ class Subgraph extends Flowchart
         $md .= "\n";
 
         if ($this->direction !== Direction::TOP_DOWN) {
-            $md .= $this->indentation()."  direction ".$this->direction->value."\n";
+            $md .= $this->indentation().'  direction '.$this->direction->value."\n";
         }
 
         $md .= implode('', $this->nodes);
