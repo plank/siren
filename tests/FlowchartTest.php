@@ -2,6 +2,7 @@
 
 use Plank\Siren\Builders\Flowchart\Enums\Arrow;
 use Plank\Siren\Builders\Flowchart\Enums\Direction;
+use Plank\Siren\Builders\Flowchart\Enums\Line;
 use Plank\Siren\Builders\Flowchart\Enums\Shape;
 use Plank\Siren\Builders\Flowchart\Exceptions\IdentifierException;
 use Plank\Siren\Builders\Flowchart\Exceptions\LinkException;
@@ -54,10 +55,10 @@ it('can render flowcharts', function () {
         ->addNode($sg1c = Node::make('sg1C')->shape(Shape::SUBROUTINE))
         ->addNode($sg1d = Node::make('sg1D')->shape(Shape::CYLINDER))
         ->addLink(Link::make($sg1a, $sg1b)->text('sg1A to sg1B'))
-        ->addLink(Link::make($sg1b, $sg1a)->text('sg1B to sg1A')->dotted())
+        ->addLink(Link::make($sg1b, $sg1a)->text('sg1B to sg1A')->line(Line::DOTTED))
         ->addLink(Link::make($sg1a, $sg1c)->text('sg1A to sg1C')->arrow(Arrow::NONE))
-        ->addLink(Link::make($sg1c, $sg1d)->text('sg1C to sg1D')->thick()->arrow(Arrow::ARROW))
-        ->addLink(Link::make($sg1d, $sg1b)->text('sg1D to sg1B')->solid()->arrow(Arrow::X)->minimumLength(2));
+        ->addLink(Link::make($sg1c, $sg1d)->text('sg1C to sg1D')->line(Line::THICK)->arrow(Arrow::ARROW))
+        ->addLink(Link::make($sg1d, $sg1b)->text('sg1D to sg1B')->line(Line::SOLID)->arrow(Arrow::X)->minimumLength(2));
 
     $sg2->addNode($sg2a = Node::make('sg2A')->shape(Shape::CIRCLE))
         ->addNode($sg2b = Node::make('sg2B')->shape(Shape::ASYMMETRIC))
@@ -76,9 +77,9 @@ it('can render flowcharts', function () {
         ->addLink(Link::make($sg4b, $sg4c)->text('sg4B to sg4C')->arrow(Arrow::NONE))
         ->addLink(Link::make($sg4c, $sg4a)->text('sg4C to sg4A')->arrow(Arrow::NONE)->minimumLength(2));
 
-    $flowchart->addLink(Link::make($subsub, $sg1)->dotted());
+    $flowchart->addLink(Link::make($subsub, $sg1)->line(Line::DOTTED));
 
-    expect((string) $flowchart)->toBe("---\ntitle: Flowchart\n---\nflowchart TD\n  A\n  B[\"B Text\"]\n  C[\"C for &amp;cent;s\"]\n  D(((D)))\n  subgraph Subgraph1\n    sg1A(sg1A)\n    sg1B([sg1B])\n    sg1C[[sg1C]]\n    sg1D[(sg1D)]\n    sg1A --- |\"sg1A to sg1B\"| sg1B\n    sg1B -.- |\"sg1B to sg1A\"| sg1A\n    sg1A --- |\"sg1A to sg1C\"| sg1C\n    sg1C ==> |\"sg1C to sg1D\"| sg1D\n    sg1D ----x |\"sg1D to sg1B\"| sg1B\n  end\n  subgraph Subgraph2\n    sg2A((sg2A))\n    sg2B>sg2B]\n    sg2C{sg2C}\n    sg2D{{sg2D}}\n    sg2A --o |\"sg2A to sg2B\"| sg2B\n    sg2B --- |\"sg2B to sg2A\"| sg2A\n    sg2A <----> |\"sg2A to sg2C\"| sg2C\n    sg2C o--o |\"sg2C to sg2D\"| sg2D\n    sg2D x--x |\"sg2D to sg2B\"| sg2B\n  end\n  subgraph Subgraph3\n    sg3A[/sg3A/]\n    sg3B[\sg3B\]\n    subgraph subsub\n      subsubA\n      subsubB\n      subsubC\n      subsubB --- subsubC\n      subsubC --- subsubA\n    end\n    sg3A --o |\"sg3A to sg3B\"| sg3B\n    sg3B --- |\"sg3B to sg3A\"| sg3A\n  end\n  subgraph Subgraph4 [\"Subgraph4 Title\"]\n    sg4A\n    sg4B\n    sg4C\n    sg4A --- |\"sg4A to sg4B\"| sg4B\n    sg4B --- |\"sg4B to sg4C\"| sg4C\n    sg4C ----- |\"sg4C to sg4A\"| sg4A\n  end\n  A --- B\n  B --- C\n  C --- D\n  D --- A\n  A --- Subgraph1\n  A --- Subgraph2\n  A --- Subgraph3\n  A --- Subgraph4\n  Subgraph1 --- Subgraph2\n  Subgraph2 --- Subgraph3\n  Subgraph3 --- Subgraph4\n  Subgraph4 --- Subgraph1\n  subsub -.- Subgraph1\n");
+    expect((string) $flowchart)->toBe("---\ntitle: Flowchart\n---\nflowchart TD\n  A\n  B[\"B Text\"]\n  C[\"C for &amp;cent;s\"]\n  D(((D)))\n  subgraph Subgraph1\n    direction LR\n    sg1A(sg1A)\n    sg1B([sg1B])\n    sg1C[[sg1C]]\n    sg1D[(sg1D)]\n    sg1A --- |\"sg1A to sg1B\"| sg1B\n    sg1B -.- |\"sg1B to sg1A\"| sg1A\n    sg1A --- |\"sg1A to sg1C\"| sg1C\n    sg1C ==> |\"sg1C to sg1D\"| sg1D\n    sg1D ----x |\"sg1D to sg1B\"| sg1B\n  end\n  subgraph Subgraph2\n    direction RL\n    sg2A((sg2A))\n    sg2B>sg2B]\n    sg2C{sg2C}\n    sg2D{{sg2D}}\n    sg2A --o |\"sg2A to sg2B\"| sg2B\n    sg2B --- |\"sg2B to sg2A\"| sg2A\n    sg2A <----> |\"sg2A to sg2C\"| sg2C\n    sg2C o--o |\"sg2C to sg2D\"| sg2D\n    sg2D x--x |\"sg2D to sg2B\"| sg2B\n  end\n  subgraph Subgraph3\n    direction TB\n    sg3A[/sg3A/]\n    sg3B[\sg3B\]\n    subgraph subsub\n      subsubA\n      subsubB\n      subsubC\n      subsubB --- subsubC\n      subsubC --- subsubA\n    end\n    sg3A --o |\"sg3A to sg3B\"| sg3B\n    sg3B --- |\"sg3B to sg3A\"| sg3A\n  end\n  subgraph Subgraph4 [\"Subgraph4 Title\"]\n    direction BT\n    sg4A\n    sg4B\n    sg4C\n    sg4A --- |\"sg4A to sg4B\"| sg4B\n    sg4B --- |\"sg4B to sg4C\"| sg4C\n    sg4C ----- |\"sg4C to sg4A\"| sg4A\n  end\n  A --- B\n  B --- C\n  C --- D\n  D --- A\n  A --- Subgraph1\n  A --- Subgraph2\n  A --- Subgraph3\n  A --- Subgraph4\n  Subgraph1 --- Subgraph2\n  Subgraph2 --- Subgraph3\n  Subgraph3 --- Subgraph4\n  Subgraph4 --- Subgraph1\n  subsub -.- Subgraph1\n");
 });
 
 it('lets you call graph as an alias of flowchart', function () {
