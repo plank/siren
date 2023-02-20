@@ -16,7 +16,8 @@ class Member
     ) {
     }
 
-    public static function make(string $name, ?string $type = null): self {
+    public static function make(string $name, ?string $type = null): self
+    {
         return new self($name, $type ? Type::make($type) : null);
     }
 
