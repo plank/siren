@@ -18,17 +18,13 @@ class Subgraph extends Flowchart
     public function __construct(
         public string $id,
         protected ?Flowchart $parent = null,
-        public ?string $title = null,
-        protected Direction $direction = Direction::TOP_DOWN,
-        protected array $subgraphs = [],
-        protected array $nodes = [],
-        protected array $links = [],
+        public ?string $title = null
     ) {
         if ($id && ($chars = $this->illegalCharacters($id))) {
             throw new IdentifierException("Illegal Characters in Subgraph id '$id'. [Illegal: $chars]");
         }
 
-        parent::__construct($title, $direction, $subgraphs, $nodes, $links);
+        parent::__construct($title);
     }
 
     public static function make(string $id): self

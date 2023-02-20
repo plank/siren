@@ -14,17 +14,25 @@ class Flowchart
     use Indented;
     use Escaped;
 
+    protected Direction $direction = Direction::TOP_DOWN;
+
     /**
-     * @param  array<Flowchart>  $subgraphs
-     * @param  array<Node>  $nodes
-     * @param  array<Link>  $links
+     * @var  array<Flowchart>  $subgraphs
      */
+    protected array $subgraphs = [];
+
+    /**
+     * @var  array<Node>  $nodes
+     */
+    protected array $nodes = [];
+
+    /**
+     * @var  array<Link>  $links
+     */
+    protected array $links = [];
+
     public function __construct(
-        public ?string $title = null,
-        protected Direction $direction = Direction::TOP_DOWN,
-        protected array $subgraphs = [],
-        protected array $nodes = [],
-        protected array $links = [],
+        public ?string $title = null
     ) {
     }
 
