@@ -17,9 +17,9 @@ Build [mermaid.js](https://mermaid.js.org/) diagrams using php.
 
 This package was developed to support [mermaid.js](https://mermaid.js.org/) 9.4.0. The following diagrams are currently supported, and have their own documentation.
 
-- [Flowchart](./docs/flowchart.md)
-- [Class Diagram](./docs/class-diagram.md)
-- [Entitiy Relationship Diagram](./docs/erd.md)
+- [Flowchart](docs/flowchart.md)
+- [Class Diagram](docs/class-diagram.md)
+- [Entitiy Relationship Diagram](docs/erd.md)
 
 &nbsp;
 
