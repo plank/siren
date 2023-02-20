@@ -9,10 +9,10 @@ use Plank\Siren\Builders\ClassDiagram\Enums\Strength;
 class Relation
 {
     public function __construct(
-        public readonly UmlClass $classA,
+        public readonly Symbol $symbolA,
         public readonly ?Connection $connectionA,
         public readonly ?Multiplicity $multiplicityA,
-        public readonly UmlClass $classB,
+        public readonly Symbol $symbolB,
         public readonly ?Connection $connectionB,
         public readonly ?Multiplicity $multiplicityB,
         public readonly Strength $strength = Strength::ASSOCIATION,
@@ -20,23 +20,23 @@ class Relation
     ) {
     }
 
+    public static function make(Symbol $symbolA, Symbol $symbolB): self
+    {
+        return new self($symbolA, null, null, $symbolB, null, null, Strength::ASSOCIATION, null);
+    }
+
     public function key(): string
     {
-        return $this->classA->name.$this->name.$this->classB->name;
+        return $this->symbolA->name.$this->name.$this->symbolB->name;
     }
 
-    public static function make(UmlClass $classA, UmlClass $classB): self
-    {
-        return new self($classA, null, null, $classB, null, null, Strength::ASSOCIATION, null);
-    }
-
-    public function name(string $name)
+    public function name(string $name): self
     {
         return new self(
-            $this->classA,
+            $this->symbolA,
             $this->connectionA,
             $this->multiplicityA,
-            $this->classB,
+            $this->symbolB,
             $this->connectionB,
             $this->multiplicityB,
             $this->strength,
@@ -44,14 +44,14 @@ class Relation
         );
     }
 
-    public function connection(UmlClass $class, ?Connection $connection)
+    public function connection(Symbol $symbol, ?Connection $connection): self
     {
-        if ($class == $this->classA) {
+        if ($symbol == $this->symbolA) {
             return new self(
-                $this->classA,
+                $this->symbolA,
                 $connection,
                 $this->multiplicityA,
-                $this->classB,
+                $this->symbolB,
                 $this->connectionB,
                 $this->multiplicityB,
                 $this->strength,
@@ -60,10 +60,10 @@ class Relation
         }
 
         return new self(
-            $this->classA,
+            $this->symbolA,
             $this->connectionA,
             $this->multiplicityA,
-            $this->classB,
+            $this->symbolB,
             $connection,
             $this->multiplicityB,
             $this->strength,
@@ -71,14 +71,14 @@ class Relation
         );
     }
 
-    public function multiplicity(UmlClass $class, ?Multiplicity $multiplicity)
+    public function multiplicity(Symbol $symbol, ?Multiplicity $multiplicity): self
     {
-        if ($class == $this->classA) {
+        if ($symbol == $this->symbolA) {
             return new self(
-                $this->classA,
+                $this->symbolA,
                 $this->connectionA,
                 $multiplicity,
-                $this->classB,
+                $this->symbolB,
                 $this->connectionB,
                 $this->multiplicityB,
                 $this->strength,
@@ -87,10 +87,10 @@ class Relation
         }
 
         return new self(
-            $this->classA,
+            $this->symbolA,
             $this->connectionA,
             $this->multiplicityA,
-            $this->classB,
+            $this->symbolB,
             $this->connectionB,
             $multiplicity,
             $this->strength,
@@ -98,37 +98,23 @@ class Relation
         );
     }
 
-    public function association()
+    public function strength(Strength $strength): self
     {
         return new self(
-            $this->classA,
+            $this->symbolA,
             $this->connectionA,
             $this->multiplicityA,
-            $this->classB,
+            $this->symbolB,
             $this->connectionB,
             $this->multiplicityB,
-            Strength::ASSOCIATION,
-            $this->name
-        );
-    }
-
-    public function dependency()
-    {
-        return new self(
-            $this->classA,
-            $this->connectionA,
-            $this->multiplicityA,
-            $this->classB,
-            $this->connectionB,
-            $this->multiplicityB,
-            Strength::DEPENDENCY,
+            $strength,
             $this->name
         );
     }
 
     public function __toString(): string
     {
-        $md = $this->classA->name.' ';
+        $md = $this->symbolA->name.' ';
 
         if ($this->multiplicityA) {
             $md .= '"'.$this->multiplicityA->value.'" ';
@@ -148,17 +134,12 @@ class Relation
             $md .= '"'.$this->multiplicityB->value.'"';
         }
 
-        $md .= ' '.$this->classB->name;
+        $md .= ' '.$this->symbolB->name;
 
         if ($this->name) {
-            $md .= ' : '.$this->label();
+            $md .= ' : '.$this->name;
         }
 
         return $md;
-    }
-
-    public function label(): string
-    {
-        return '"'.$this->name.'"';
     }
 }

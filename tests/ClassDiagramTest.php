@@ -1,96 +1,118 @@
 <?php
 
+use Plank\Siren\Builders\ClassDiagram\Argument;
+use Plank\Siren\Builders\ClassDiagram\Enums\Classifier;
 use Plank\Siren\Builders\ClassDiagram\Enums\Connection;
+use Plank\Siren\Builders\ClassDiagram\Enums\Direction;
+use Plank\Siren\Builders\ClassDiagram\Enums\Modifier;
 use Plank\Siren\Builders\ClassDiagram\Enums\Multiplicity;
-use Plank\Siren\Builders\ClassDiagram\Exceptions\ClassException;
+use Plank\Siren\Builders\ClassDiagram\Enums\Strength;
+use Plank\Siren\Builders\ClassDiagram\Enums\Visibility;
+use Plank\Siren\Builders\ClassDiagram\Exceptions\MemberException;
+use Plank\Siren\Builders\ClassDiagram\Exceptions\SymbolException;
 use Plank\Siren\Builders\ClassDiagram\Exceptions\RelationException;
 use Plank\Siren\Builders\ClassDiagram\Member;
 use Plank\Siren\Builders\ClassDiagram\Method;
 use Plank\Siren\Builders\ClassDiagram\Relation;
-use Plank\Siren\Builders\ClassDiagram\UmlClass;
+use Plank\Siren\Builders\ClassDiagram\Symbol;
+use Plank\Siren\Builders\Flowchart\Enums\Arrow;
 use Plank\Siren\Siren;
 
 it('can render class diagrams', function () {
     $mermaid = Siren::class('Class Diagram')
-        ->addClass($a = new UmlClass('ClassA'))
-        ->addClass($b = (new UmlClass('ClassB'))->interface())
-        ->addClass($c = (new UmlClass('ClassC'))->abstract())
-        ->addClass($d = (new UmlClass('ClassD'))->service())
-        ->addClass($e = (new UmlClass('ClassE'))->enumeration())
-        ->addClass($f = new UmlClass('ClassF'))
-        ->addClass($g = new UmlClass('ClassG'))
-        ->addClass($h = new UmlClass('ClassH'))
-        ->addClass($i = new UmlClass('ClassI'))
-        ->addClass($j = new UmlClass('ClassJ', [
-            Member::make('one'),
-            Member::make('two')->public(),
-            Member::make('three')->protected(),
-            Member::make('four')->private()->abstract()->type('int'),
-            Member::make('five')->internal()->static()->type('List', 'Number'),
-        ], [
-            Method::make('a')
-                ->addArgument('first')
-                ->addArgument('second', 'string')
-                ->addArgument('third', 'array', 'int'),
-            Method::make('b')->public()->abstract(),
-            Method::make('c')->protected()->static(),
-            Method::make('d')->private()->return('bool'),
-            Method::make('e')->internal()->return('array', 'int'),
-        ]))
-        ->addRelation(Relation::make($a, $b)
+        ->addSymbol($a = Symbol::class('ClassA'))
+        ->addSymbol($b = Symbol::class('AbstractB', Modifier::ABSTRACT))
+        ->addSymbol($c = Symbol::class('FinalC', Modifier::FINAL))
+        ->addSymbol($d = Symbol::interface('InterfaceD'))
+        ->addSymbol($e = Symbol::enum('EnumE'))
+        ->addSymbol($f = Symbol::trait('TraitF'))
+        ->addSymbol($g = Symbol::class('ClassG')->annotation('SomethingSpecial'))
+        ->addSymbol($h = Symbol::class('ClassH'))
+        ->addSymbol($i = Symbol::class('ClassI'))
+        ->addSymbol($j = Symbol::class('ClassJ')
+            ->addMember(Member::make('one'))
+            ->addMember(Member::make('two')->visibility(Visibility::PUBLIC))
+            ->addMember(Member::make('three')->visibility(Visibility::PROTECTED))
+            ->addMember(Member::make('four')
+                ->visibility(Visibility::PRIVATE)
+                ->type('int')
+            )->addMember(Member::make('five')
+                ->visibility(Visibility::INTERNAL)
+                ->classifier(Classifier::STATIC)
+                ->type('Pride<Lion&Mammal>')
+            )->addMethod(Method::make('a')
+                ->addArgument(Argument::make('first'))
+                ->addArgument(Argument::make('second', 'string'))
+                ->addArgument(Argument::make('third', 'array<int>'))
+            )->addMethod(Method::make('b')
+                ->visibility(Visibility::PUBLIC)
+                ->classifier(Classifier::ABSTRACT)
+            )->addMethod(Method::make('c')
+                ->visibility(Visibility::PROTECTED)
+                ->classifier(Classifier::STATIC)
+            )->addMethod(Method::make('d')
+                ->visibility(Visibility::PRIVATE)
+                ->return('bool')
+            )->addMethod(Method::make('e')
+                ->visibility(Visibility::INTERNAL)
+                ->return('array<array<string>>')
+            )
+        )->addRelation(Relation::make($a, $b)
             ->connection($a, Connection::AGGREGATION)
-            ->multiplicity($b, Multiplicity::MANY))
-        ->addRelation(Relation::make($a, $c)
+            ->multiplicity($b, Multiplicity::MANY)
+        )->addRelation(Relation::make($a, $c)
             ->name('A to C')
             ->connection($a, Connection::COMPOSITION)
             ->multiplicity($c, Multiplicity::N)
-            ->dependency())
-        ->addRelation(Relation::make($a, $d)
+            ->strength(Strength::DEPENDENCY)
+        )->addRelation(Relation::make($a, $d)
             ->name('A to D')
             ->connection($a, Connection::DEPENDENCY)
             ->multiplicity($d, Multiplicity::ONE_OR_MORE)
-            ->association())
-        ->addRelation(Relation::make($a, $e)
+            ->strength(Strength::ASSOCIATION)
+        )->addRelation(Relation::make($a, $e)
             ->name('A to E')
             ->connection($a, Connection::EXTENSION)
-            ->multiplicity($e, Multiplicity::ONE_TO_N))
-        ->addRelation(Relation::make($a, $f)
+            ->multiplicity($e, Multiplicity::ONE_TO_N)
+        )->addRelation(Relation::make($a, $f)
             ->name('A to F')
             ->multiplicity($a, Multiplicity::ONLY_ONE)
-            ->connection($f, Connection::AGGREGATION))
-        ->addRelation(Relation::make($a, $g)
+            ->connection($f, Connection::AGGREGATION)
+        )->addRelation(Relation::make($a, $g)
             ->name('A to G')
             ->multiplicity($a, Multiplicity::ZERO_OR_ONE)
-            ->connection($g, Connection::COMPOSITION))
-        ->addRelation(Relation::make($a, $h)
+            ->connection($g, Connection::COMPOSITION)
+        )->addRelation(Relation::make($a, $h)
             ->name('A to H')
             ->multiplicity($a, Multiplicity::ZERO_TO_N)
-            ->connection($h, Connection::DEPENDENCY))
-        ->addRelation(Relation::make($a, $i)
+            ->connection($h, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($a, $i)
             ->connection($i, Connection::EXTENSION)
-            ->name('A to I'))
-        ->addRelation(Relation::make($a, $j)->dependency());
+            ->name('A to I')
+        )->addRelation(Relation::make($a, $j)
+            ->strength(Strength::DEPENDENCY)
+        );
 
-    expect((string) $mermaid)->toContain("---\ntitle: Class Diagram\n---\nclassDiagram\nclass ClassA\nclass ClassB{\n<<interface>>\n}\n\nclass ClassC{\n<<abstract>>\n}\n\nclass ClassD{\n<<service>>\n}\n\nclass ClassE{\n<<enumeration>>\n}\n\nclass ClassF\nclass ClassG\nclass ClassH\nclass ClassI\nclass ClassJ{\none\n+two\n#three\nint four*\nList~Number~ five$\na(first, string second, array~int~ third)\n+b()*\n#c()$\n-d() bool\n~e() array~int~\n}\n\nClassA o--\"*\" ClassB\nClassA *..\"n\" ClassC : \"A to C\"\nClassA <--\"1..*\" ClassD : \"A to D\"\nClassA <|--\"1..n\" ClassE : \"A to E\"\nClassA \"1\" --o ClassF : \"A to F\"\nClassA \"0..1\" --* ClassG : \"A to G\"\nClassA \"0..n\" --> ClassH : \"A to H\"\nClassA --|> ClassI : \"A to I\"\nClassA .. ClassJ");
+    expect((string) $mermaid)->toBe("---\ntitle: Class Diagram\n---\nclassDiagram\nclass ClassA\nclass AbstractB{\n<<abstract>>\n}\n\nclass FinalC{\n<<final>>\n}\n\nclass InterfaceD{\n<<interface>>\n}\n\nclass EnumE{\n<<enum>>\n}\n\nclass TraitF{\n<<trait>>\n}\n\nclass ClassG{\n<<SomethingSpecial>>\n}\n\nclass ClassH\nclass ClassI\nclass ClassJ{\none\n+two\n#three\nint four\nPride~Lion&Mammal~ five$\na(first, string second, array~int~ third)\n+b()*\n#c()$\n-d() bool\n~e() array~array~string~~\n}\n\nClassA o--\"*\" AbstractB\nClassA *..\"n\" FinalC : A to C\nClassA <--\"1..*\" InterfaceD : A to D\nClassA <|--\"1..n\" EnumE : A to E\nClassA \"1\" --o TraitF : A to F\nClassA \"0..1\" --* ClassG : A to G\nClassA \"0..n\" --> ClassH : A to H\nClassA --|> ClassI : A to I\nClassA .. ClassJ\n");
 });
 
 it('does not allow you to create class names with spaces in them', function () {
-    expect(fn () => new UmlClass('Uh Oh'))->toThrow(ClassException::class);
+    expect(fn () => new Symbol('Uh Oh'))->toThrow(SymbolException::class);
 });
 
 it('does not allow you to create multiple classes with the same name', function () {
     expect(function () {
         Siren::class()
-            ->addClass(new UmlClass('ClassA'))
-            ->addClass(new UmlClass('ClassA'));
-    })->toThrow(ClassException::class);
+            ->addSymbol(Symbol::class('ClassA'))
+            ->addSymbol(Symbol::class('ClassA'));
+    })->toThrow(SymbolException::class);
 });
 
 it('does not allow you to create multiple class relations with the same key', function () {
     expect(function () {
         Siren::class()
-            ->addClass($a = new UmlClass('ClassA'))
-            ->addClass($b = new UmlClass('ClassB'))
+            ->addSymbol($a = Symbol::class('ClassA'))
+            ->addSymbol($b = Symbol::class('ClassB'))
             ->addRelation(Relation::make($a, $b))
             ->addRelation(Relation::make($a, $b));
     })->toThrow(RelationException::class);
@@ -98,21 +120,314 @@ it('does not allow you to create multiple class relations with the same key', fu
 
 it('it allows you to remove classes from the class diagram', function () {
     $mermaid = Siren::class()
-        ->addClass($a = new UmlClass('ClassA'))
-        ->addClass($b = new UmlClass('ClassB'))
-        ->removeClass($a);
+        ->addSymbol($a = Symbol::class('ClassA'))
+        ->addSymbol(Symbol::class('ClassB'))
+        ->removeSymbol($a);
 
     expect((string) $mermaid)->not()->toContain('ClassA');
 });
 
 it('it allows you to remove relations from the class diagram', function () {
     $mermaid = Siren::class()
-        ->addClass($a = new UmlClass('ClassA'))
-        ->addClass($b = new UmlClass('ClassB'))
-        ->addClass($c = new UmlClass('ClassC'))
+        ->addSymbol($a = Symbol::class('ClassA'))
+        ->addSymbol($b = Symbol::class('ClassB'))
+        ->addSymbol($c = Symbol::class('ClassC'))
         ->addRelation(Relation::make($a, $b))
         ->addRelation(Relation::make($b, $c))
         ->removeRelation(Relation::make($a, $b));
 
     expect((string) $mermaid)->not()->toContain('ClassA -- ClassB');
+});
+
+it('can document itself', function () {
+    $diagram = Siren::class('Diagram for Siren ClassDiagram')
+        ->addSymbol($builder = Symbol::class('ClassDiagram')
+            ->addMember(Member::make('title', '?string')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('symbols', 'array')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('relations', 'array')
+                ->visibility(Visibility::PUBLIC)
+            )->addMethod(Method::make('addSymbol')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('symbol', 'Symbol')
+                ->return('self')
+            )->addMethod(Method::make('hasSymbol')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('symbol', 'Symbol')
+                ->return('bool')
+            )->addMethod(Method::make('removeSymbol')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('symbol', 'Symbol')
+                ->return('self')
+            )->addMethod(Method::make('addRelation')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('relation', 'Relation')
+                ->return('self')
+            )->addMethod(Method::make('hasRelation')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('relation', 'Relation')
+                ->return('bool')
+            )->addMethod(Method::make('removeRelation')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('relation', 'Relation')
+                ->return('self')
+            )->addMethod(Method::make('__toString')
+                ->return('string')
+            )
+        )->addSymbol($symbol = Symbol::class('Symbol')
+            ->addMember(Member::make('name', 'string')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('members', 'array<Member>')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('methods', 'array<Method>')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('annotation', '?string')
+                ->visibility(Visibility::PUBLIC)
+            )->addMethod(Method::make('class')
+                ->classifier(Classifier::STATIC)
+                ->addArgument('name', 'string')
+                ->addArgument('modifier', '?Modifier')
+                ->return('self')
+            )->addMethod(Method::make('interface')
+                ->classifier(Classifier::STATIC)
+                ->addArgument('name', 'string')
+                ->return('self')
+            )->addMethod(Method::make('enum')
+                ->classifier(Classifier::STATIC)
+                ->addArgument('name', 'string')
+                ->return('self')
+            )->addMethod(Method::make('trait')
+                ->classifier(Classifier::STATIC)
+                ->addArgument('name', 'string')
+                ->return('self')
+            )->addMethod(Method::make('annotation')
+                ->addArgument('annotation', 'string')
+                ->return('self')
+            )->addMethod(Method::make('addMember')
+                ->addArgument('member', 'Member')
+                ->return('self')
+            )->addMethod(Method::make('addMethod')
+                ->addArgument('method', 'Method')
+                ->return('self')
+            )->addMethod(Method::make('__toString')
+                ->return('string')
+            )
+        )->addSymbol($member = Symbol::class('Member')
+            ->addMember(Member::make('name', 'string')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('type', '?Type')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('classifier', '?Classifier')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('visibility', '?Visibility')
+                ->visibility(Visibility::PUBLIC)
+            )->addMethod(Method::make('make')
+                ->visibility(Visibility::PUBLIC)
+                ->classifier(Classifier::STATIC)
+                ->addArgument('name', 'string')
+                ->addArgument('type', '?string')
+                ->return('self')
+            )->addMethod(Method::make('type')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('type', 'string')
+                ->return('self')
+            )->addMethod(Method::make('classifier')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('classifier', 'Classifier')
+                ->return('self')
+            )->addMethod(Method::make('visibility')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('visibility', 'Visibility')
+                ->return('self')
+            )->addMethod(Method::make('__toString')
+                ->visibility(Visibility::PUBLIC)
+                ->return('string')
+            )
+        )->addSymbol($method = Symbol::class('Method')
+            ->addMember(Member::make('name', 'string')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('arguments', 'array')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('return', '?Type')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('visibility', '?Visibility')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('classifier', '?Classifier')
+                ->visibility(Visibility::PUBLIC)
+            )->addMethod(Method::make('make')
+                ->visibility(Visibility::PUBLIC)
+                ->classifier(Classifier::STATIC)
+                ->addArgument('name', 'string')
+                ->return('self')
+            )->addMethod(Method::make('addArgument')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('name', 'string')
+                ->addArgument('type', '?string')
+                ->return('self')
+            )->addMethod(Method::make('return')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('type', 'string')
+                ->return('self')
+            )->addMethod(Method::make('classifier')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('classifier', 'Classifier')
+                ->return('self')
+            )->addMethod(Method::make('visibility')
+                ->visibility(Visibility::PUBLIC)
+                ->addArgument('visibility', 'Visibility')
+                ->return('self')
+            )->addMethod(Method::make('__toString')
+                ->visibility(Visibility::PUBLIC)
+                ->return('string')
+            )
+        )->addSymbol($relation = Symbol::class('Relation')
+            ->addMember(Member::make('symbolA', 'Symbol')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('connectionA', '?Connection')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('multiplicityA', '?Multiplicity')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('symbolB', 'Symbol')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('connectionB', '?Connection')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('multiplicityB', '?Multiplicity')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('strength', 'Strength')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('name', '?string')
+                ->visibility(Visibility::PUBLIC)
+            )->addMethod(Method::make('make')
+                ->classifier(Classifier::STATIC)
+                ->addArgument('symbolA', 'Symbol')
+                ->addArgument('symbolB', 'Symbol')
+                ->return('self')
+            )->addMethod(Method::make('key')
+                ->return('string')
+            )->addMethod(Method::make('name')
+                ->addArgument('name', 'string')
+                ->return('self')
+            )->addMethod(Method::make('connection')
+                ->addArgument('symbol', 'Symbol')
+                ->addArgument('connection', '?Connection')
+                ->return('self')
+            )->addMethod(Method::make('multiplicity')
+                ->addArgument('symbol', 'Symbol')
+                ->addArgument('multiplicity', '?Multiplicity')
+                ->return('self')
+            )->addMethod(Method::make('strength')
+                ->addArgument('strength', 'Strength')
+                ->return('self')
+            )->addMethod(Method::make('__toString')
+                ->return('string')
+            )
+        )->addSymbol($type = Symbol::class('Type')
+            ->addMember(Member::make('type', 'string')
+                ->visibility(Visibility::PUBLIC)
+            )->addMethod(Method::make('make')
+                ->visibility(Visibility::PUBLIC)
+                ->classifier(Classifier::STATIC)
+                ->addArgument('type', 'string')
+                ->return('self')
+            )->addMethod(Method::make('__toString')
+                ->return('string')
+            )
+        )->addSymbol($argument = Symbol::class('Argument')
+            ->addMember(Member::make('name', 'string')
+                ->visibility(Visibility::PUBLIC)
+            )->addMember(Member::make('type', '?Type')
+                ->visibility(Visibility::PUBLIC)
+            )->addMethod(Method::make('make')
+                ->visibility(Visibility::PUBLIC)
+                ->classifier(Classifier::STATIC)
+                ->addArgument('name', 'string')
+                ->addArgument('type', '?string')
+                ->return('self')
+            )->addMethod(Method::make('__toString')
+                ->return('string')
+            )
+        )->addSymbol($classifier = Symbol::enum('Classifier')
+            ->addMember(Member::make('ABSTRACT'))
+            ->addMember(Member::make('STATIC'))
+        )->addSymbol($connection = Symbol::enum('Connection')
+            ->addMember(Member::make('EXTENSION'))
+            ->addMember(Member::make('DEPENDENCY'))
+            ->addMember(Member::make('COMPOSITION'))
+            ->addMember(Member::make('AGGREGATION'))
+        )->addSymbol($modifier = Symbol::enum('Modifier')
+            ->addMember(Member::make('ABSTRACT'))
+            ->addMember(Member::make('FINAL'))
+        )->addSymbol($multiplicity = Symbol::enum('Multiplicity')
+            ->addMember(Member::make('ONLY_ONE'))
+            ->addMember(Member::make('ZERO_OR_ONE'))
+            ->addMember(Member::make('ONE_OR_MORE'))
+            ->addMember(Member::make('MANY'))
+            ->addMember(Member::make('N'))
+            ->addMember(Member::make('ZERO_TO_N'))
+            ->addMember(Member::make('ONE_TO_N'))
+        )->addSymbol($strength = Symbol::enum('Strength')
+            ->addMember(Member::make('DEPENDENCY'))
+            ->addMember(Member::make('ASSOCIATION'))
+        )->addSymbol($visibility = Symbol::enum('Visibility')
+            ->addMember(Member::make('PUBLIC'))
+            ->addMember(Member::make('PROTECTED'))
+            ->addMember(Member::make('PRIVATE'))
+            ->addMember(Member::make('INTERNAL'))
+        )->addRelation(Relation::make($builder, $symbol)
+            ->connection($symbol, Connection::AGGREGATION)
+        )->addRelation(Relation::make($builder, $relation)
+            ->connection($relation, Connection::AGGREGATION)
+        )->addRelation(Relation::make($relation, $multiplicity)
+            ->connection($multiplicity, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($relation, $strength)
+            ->connection($strength, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($relation, $connection)
+            ->connection($connection, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($symbol, $member)
+            ->connection($member, Connection::AGGREGATION)
+        )->addRelation(Relation::make($symbol, $method)
+            ->connection($method, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($symbol, $modifier)
+            ->connection($modifier, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($member, $type)
+            ->connection($type, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($member, $classifier)
+            ->connection($classifier, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($member, $visibility)
+            ->connection($visibility, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($method, $type)
+            ->connection($type, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($method, $argument)
+            ->connection($argument, Connection::AGGREGATION)
+        )->addRelation(Relation::make($method, $visibility)
+            ->connection($visibility, Connection::DEPENDENCY)
+        )->addRelation(Relation::make($method, $classifier)
+            ->connection($classifier, Connection::DEPENDENCY)
+    );
+
+    expect((string) $diagram)->toBe("---\ntitle: Diagram for Siren ClassDiagram\n---\nclassDiagram\nclass ClassDiagram{\n?string title\narray symbols\narray relations\n+addSymbol(Symbol symbol) self\n+hasSymbol(Symbol symbol) bool\n+removeSymbol(Symbol symbol) self\n+addRelation(Relation relation) self\n+hasRelation(Relation relation) bool\n+removeRelation(Relation relation) self\n__toString() string\n}\n\nclass Symbol{\nstring name\narray~Member~ members\narray~Method~ methods\n?string annotation\nclass(string name, ?Modifier modifier)\$ self\ninterface(string name)\$ self\nenum(string name)\$ self\ntrait(string name)\$ self\nannotation(string annotation) self\naddMember(Member member) self\naddMethod(Method method) self\n__toString() string\n}\n\nclass Member{\nstring name\n?Type type\n?Classifier classifier\n?Visibility visibility\n+make(string name, ?string type)\$ self\n+type(string type) self\n+classifier(Classifier classifier) self\n+visibility(Visibility visibility) self\n+__toString() string\n}\n\nclass Method{\nstring name\narray arguments\n?Type return\n?Visibility visibility\n?Classifier classifier\n+make(string name)\$ self\n+addArgument(string name, ?string type) self\n+return(string type) self\n+classifier(Classifier classifier) self\n+visibility(Visibility visibility) self\n+__toString() string\n}\n\nclass Relation{\nSymbol symbolA\n?Connection connectionA\n?Multiplicity multiplicityA\nSymbol symbolB\n?Connection connectionB\n?Multiplicity multiplicityB\nStrength strength\n?string name\nmake(Symbol symbolA, Symbol symbolB)\$ self\nkey() string\nname(string name) self\nconnection(Symbol symbol, ?Connection connection) self\nmultiplicity(Symbol symbol, ?Multiplicity multiplicity) self\nstrength(Strength strength) self\n__toString() string\n}\n\nclass Type{\nstring type\n+make(string type)\$ self\n__toString() string\n}\n\nclass Argument{\nstring name\n?Type type\n+make(string name, ?string type)\$ self\n__toString() string\n}\n\nclass Classifier{\n<<enum>>\nABSTRACT\nSTATIC\n}\n\nclass Connection{\n<<enum>>\nEXTENSION\nDEPENDENCY\nCOMPOSITION\nAGGREGATION\n}\n\nclass Modifier{\n<<enum>>\nABSTRACT\nFINAL\n}\n\nclass Multiplicity{\n<<enum>>\nONLY_ONE\nZERO_OR_ONE\nONE_OR_MORE\nMANY\nN\nZERO_TO_N\nONE_TO_N\n}\n\nclass Strength{\n<<enum>>\nDEPENDENCY\nASSOCIATION\n}\n\nclass Visibility{\n<<enum>>\nPUBLIC\nPROTECTED\nPRIVATE\nINTERNAL\n}\n\nClassDiagram --o Symbol\nClassDiagram --o Relation\nRelation --> Multiplicity\nRelation --> Strength\nRelation --> Connection\nSymbol --o Member\nSymbol --> Method\nSymbol --> Modifier\nMember --> Type\nMember --> Classifier\nMember --> Visibility\nMethod --> Type\nMethod --o Argument\nMethod --> Visibility\nMethod --> Classifier\n");
+});
+
+it('does not allow you to add properties to an interface', function () {
+    expect(function () {
+        Symbol::interface('InterfaceA')
+            ->addMember(Member::make('propertyA')->visibility(Visibility::PROTECTED));
+    })->toThrow(SymbolException::class);
+});
+
+it('does not allow you to declare members abstract', function () {
+    expect(function () {
+        Member::make('propertyA')->classifier(Classifier::ABSTRACT);
+    })->toThrow(MemberException::class);
+});
+
+it('allows you specify the direction of the class diagram', function () {
+    $diagram = Siren::class('Class Diagram')
+        ->direction(Direction::BOTTOM_TO_TOP)
+        ->addSymbol($a = Symbol::class('ClassA'))
+        ->addSymbol($b = Symbol::class('ClassB'))
+        ->addRelation(Relation::make($a, $b)->connection($a, Connection::DEPENDENCY));
+    
+    expect((string) $diagram)->toBe("---\ntitle: Class Diagram\n---\nclassDiagram\ndirection BT\nclass ClassA\nclass ClassB\nClassA <-- ClassB\n");
 });

@@ -4,6 +4,6 @@ namespace Plank\Siren\Builders\ClassDiagram\Exceptions;
 
 use Exception;
 
-class ClassException extends Exception
+class SymbolException extends Exception
 {
 }

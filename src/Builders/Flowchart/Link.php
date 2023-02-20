@@ -19,7 +19,7 @@ class Link
         public readonly Line $line = Line::SOLID,
         public readonly Arrow $destArrow = Arrow::NONE,
         public readonly ?string $text = null,
-        public readonly int $minimumLength = 0
+        public readonly int $span = 0
     ) {
     }
 
@@ -42,7 +42,7 @@ class Link
             $this->line,
             $this->destArrow,
             $text,
-            $this->minimumLength
+            $this->span
         );
     }
 
@@ -55,7 +55,7 @@ class Link
             $line,
             $this->destArrow,
             $this->text,
-            $this->minimumLength
+            $this->span
         );
     }
 
@@ -68,7 +68,7 @@ class Link
             $this->line,
             $arrow,
             $this->text,
-            $this->minimumLength
+            $this->span
         );
     }
 
@@ -81,11 +81,11 @@ class Link
             $this->line,
             $arrow,
             $this->text,
-            $this->minimumLength
+            $this->span
         );
     }
 
-    public function minimumLength(int $length): self
+    public function span(int $length): self
     {
         return new self(
             $this->src,
@@ -102,7 +102,7 @@ class Link
     {
         $md = $this->indentation().$this->src->id.' ';
 
-        $md .= $this->line->withArrows($this->srcArrow, $this->destArrow, $this->minimumLength).' ';
+        $md .= $this->line->withArrows($this->srcArrow, $this->destArrow, $this->span).' ';
 
         if ($this->text) {
             $md .= '|'.$this->escape($this->text).'| ';

@@ -58,7 +58,7 @@ it('can render flowcharts', function () {
         ->addLink(Link::make($sg1b, $sg1a)->text('sg1B to sg1A')->line(Line::DOTTED))
         ->addLink(Link::make($sg1a, $sg1c)->text('sg1A to sg1C')->arrow(Arrow::NONE))
         ->addLink(Link::make($sg1c, $sg1d)->text('sg1C to sg1D')->line(Line::THICK)->arrow(Arrow::ARROW))
-        ->addLink(Link::make($sg1d, $sg1b)->text('sg1D to sg1B')->line(Line::SOLID)->arrow(Arrow::X)->minimumLength(2));
+        ->addLink(Link::make($sg1d, $sg1b)->text('sg1D to sg1B')->line(Line::SOLID)->arrow(Arrow::X)->span(2));
 
     $sg2->addNode($sg2a = Node::make('sg2A')->shape(Shape::CIRCLE))
         ->addNode($sg2b = Node::make('sg2B')->shape(Shape::ASYMMETRIC))
@@ -66,7 +66,7 @@ it('can render flowcharts', function () {
         ->addNode($sg2d = Node::make('sg2D')->shape(Shape::HEXAGON))
         ->addLink(Link::make($sg2a, $sg2b)->text('sg2A to sg2B')->arrow(Arrow::DOT))
         ->addLink(Link::make($sg2b, $sg2a)->text('sg2B to sg2A')->multiArrow(Arrow::NONE))
-        ->addLink(Link::make($sg2a, $sg2c)->text('sg2A to sg2C')->multiArrow(Arrow::ARROW)->minimumLength(2))
+        ->addLink(Link::make($sg2a, $sg2c)->text('sg2A to sg2C')->multiArrow(Arrow::ARROW)->span(2))
         ->addLink(Link::make($sg2c, $sg2d)->text('sg2C to sg2D')->multiArrow(Arrow::DOT))
         ->addLink(Link::make($sg2d, $sg2b)->text('sg2D to sg2B')->multiArrow(Arrow::X));
 
@@ -75,7 +75,7 @@ it('can render flowcharts', function () {
         ->addNode($sg4c = Node::make('sg4C'))
         ->addLink(Link::make($sg4a, $sg4b)->text('sg4A to sg4B')->arrow(Arrow::NONE))
         ->addLink(Link::make($sg4b, $sg4c)->text('sg4B to sg4C')->arrow(Arrow::NONE))
-        ->addLink(Link::make($sg4c, $sg4a)->text('sg4C to sg4A')->arrow(Arrow::NONE)->minimumLength(2));
+        ->addLink(Link::make($sg4c, $sg4a)->text('sg4C to sg4A')->arrow(Arrow::NONE)->span(2));
 
     $flowchart->addLink(Link::make($subsub, $sg1)->line(Line::DOTTED));
 
@@ -112,7 +112,7 @@ it('does not allow you to create multiple links with the same key', function () 
     })->toThrow(LinkException::class);
 });
 
-it('it allows you to remove nodes from the flowchart', function () {
+it('allows you to remove nodes from the flowchart', function () {
     $flowchart = Siren::flowchart()
         ->addNode($a = Node::make('NodeA'))
         ->addNode(Node::make('NodeB'))
@@ -121,7 +121,7 @@ it('it allows you to remove nodes from the flowchart', function () {
     expect((string) $flowchart)->not()->toContain('NodeA');
 });
 
-it('it allows you to remove relations from the class diagram', function () {
+it('allows you to remove relations from the class diagram', function () {
     $flowchart = Siren::flowchart()
         ->addNode($a = Node::make('NodeA'))
         ->addNode($b = Node::make('NodeB'))
@@ -133,7 +133,7 @@ it('it allows you to remove relations from the class diagram', function () {
     expect((string) $flowchart)->not()->toContain('NodeA --- NodeB');
 });
 
-it('it throws an error when two subgraphs share the same id', function () {
+it('throws an error when two subgraphs share the same id', function () {
     expect(function () {
         Siren::flowchart()
             ->addSubgraph(Subgraph::make('SubgraphA'))
@@ -141,7 +141,7 @@ it('it throws an error when two subgraphs share the same id', function () {
     })->toThrow(SubgraphException::class);
 });
 
-it('it throws an error when a subgraph collides on nodes', function () {
+it('throws an error when a subgraph collides on nodes', function () {
     expect(function () {
         Siren::flowchart()
             ->addSubgraph(Subgraph::make('SubgraphA')->addNode(Node::make('NodeA')))
@@ -149,7 +149,7 @@ it('it throws an error when a subgraph collides on nodes', function () {
     })->toThrow(SubgraphException::class);
 });
 
-it('it throws an error when a subgraph collides on links', function () {
+it('throws an error when a subgraph collides on links', function () {
     expect(function () {
         Siren::flowchart()
             ->addSubgraph(Subgraph::make('SubgraphA')->addLink(Link::make(Node::make('A'), Node::make('B'))))

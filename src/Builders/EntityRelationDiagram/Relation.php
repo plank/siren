@@ -54,7 +54,7 @@ class Relation
         );
     }
 
-    public function identifying(): self
+    public function identification(Identification $identification): self
     {
         return new self(
             $this->entityA,
@@ -62,19 +62,7 @@ class Relation
             $this->entityB,
             $this->cardinalityB,
             $this->name,
-            Identification::IDENTIFYING
-        );
-    }
-
-    public function nonIdentifying(): self
-    {
-        return new self(
-            $this->entityA,
-            $this->cardinalityA,
-            $this->entityB,
-            $this->cardinalityB,
-            $this->name,
-            Identification::NON_IDENTIFYING
+            $identification
         );
     }
 

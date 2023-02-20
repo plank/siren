@@ -2,41 +2,50 @@
 
 namespace Plank\Siren\Builders\ClassDiagram;
 
-use Plank\Siren\Builders\ClassDiagram\Exceptions\ClassException;
+use Plank\Siren\Builders\ClassDiagram\Enums\Direction;
+use Plank\Siren\Builders\ClassDiagram\Exceptions\SymbolException;
 use Plank\Siren\Builders\ClassDiagram\Exceptions\RelationException;
 
 class ClassDiagram
 {
     /**
-     * @param  array<UmlClass>  $classes
+     * @param  array<Symbol>  $symbols
      * @param  array<Relation>  $relations
      */
     public function __construct(
         protected ?string $title = null,
-        protected array $classes = [],
-        protected array $relations = []
+        protected array $symbols = [],
+        protected array $relations = [],
+        protected Direction $direction = Direction::TOP_DOWN
     ) {
     }
 
-    public function addClass(UmlClass $class): self
+    public function direction(Direction $direction): self
     {
-        if ($this->hasClass($class)) {
-            throw new ClassException('You cannot have duplicate classes in the same Class Diagram.');
-        }
-
-        $this->classes[$class->name] = $class;
+        $this->direction = $direction;
 
         return $this;
     }
 
-    public function hasClass(UmlClass $class): bool
+    public function addSymbol(Symbol $symbol): self
     {
-        return isset($this->classes[$class->name]);
+        if ($this->hasSymbol($symbol)) {
+            throw new SymbolException('You cannot have duplicate classes in the same Class Diagram.');
+        }
+
+        $this->symbols[$symbol->name] = $symbol;
+
+        return $this;
     }
 
-    public function removeClass(UmlClass $class): self
+    public function hasSymbol(Symbol $symbol): bool
     {
-        unset($this->classes[$class->name]);
+        return isset($this->symbols[$symbol->name]);
+    }
+
+    public function removeSymbol(Symbol $symbol): self
+    {
+        unset($this->symbols[$symbol->name]);
 
         return $this;
     }
@@ -76,8 +85,12 @@ class ClassDiagram
 
         $md .= "classDiagram\n";
 
-        foreach ($this->classes as $class) {
-            $md .= $class."\n";
+        if ($this->direction !== Direction::TOP_DOWN) {
+            $md .= "direction ".$this->direction->value."\n";
+        }
+
+        foreach ($this->symbols as $symbol) {
+            $md .= $symbol."\n";
         }
 
         foreach ($this->relations as $relation) {

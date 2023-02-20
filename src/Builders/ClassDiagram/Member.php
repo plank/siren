@@ -4,6 +4,7 @@ namespace Plank\Siren\Builders\ClassDiagram;
 
 use Plank\Siren\Builders\ClassDiagram\Enums\Classifier;
 use Plank\Siren\Builders\ClassDiagram\Enums\Visibility;
+use Plank\Siren\Builders\ClassDiagram\Exceptions\MemberException;
 
 class Member
 {
@@ -15,82 +16,41 @@ class Member
     ) {
     }
 
-    public static function make(
-        string $name,
-        ?Type $type = null,
-        ?Classifier $classifier = null,
-        ?Visibility $visibility = null
-    ): self {
-        return new self($name, $type, $classifier, $visibility);
+    public static function make(string $name, ?string $type = null): self {
+        return new self($name, $type ? Type::make($type) : null);
     }
 
-    public function type(string $type, ?string $of = null): self
+    public function type(string $type): self
     {
         return new self(
             $this->name,
-            new Type($type, $of),
+            Type::make($type),
             $this->classifier,
             $this->visibility
         );
     }
 
-    public function abstract(): self
+    public function classifier(Classifier $classifier): self
     {
+        if ($classifier === Classifier::ABSTRACT) {
+            throw new MemberException('You cannot declare members abstract.');
+        }
+
         return new self(
             $this->name,
             $this->type,
-            Classifier::ABSTRACT,
+            $classifier,
             $this->visibility
         );
     }
 
-    public function static(): self
-    {
-        return new self(
-            $this->name,
-            $this->type,
-            Classifier::STATIC,
-            $this->visibility
-        );
-    }
-
-    public function public(): self
+    public function visibility(Visibility $visibility): self
     {
         return new self(
             $this->name,
             $this->type,
             $this->classifier,
-            Visibility::PUBLIC
-        );
-    }
-
-    public function protected(): self
-    {
-        return new self(
-            $this->name,
-            $this->type,
-            $this->classifier,
-            Visibility::PROTECTED
-        );
-    }
-
-    public function private(): self
-    {
-        return new self(
-            $this->name,
-            $this->type,
-            $this->classifier,
-            Visibility::PRIVATE
-        );
-    }
-
-    public function internal(): self
-    {
-        return new self(
-            $this->name,
-            $this->type,
-            $this->classifier,
-            Visibility::INTERNAL
+            $visibility
         );
     }
 

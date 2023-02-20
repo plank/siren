@@ -19,108 +19,51 @@ class Method
     ) {
     }
 
-    public static function make(
-        string $name,
-        array $arguments = [],
-        ?Type $return = null,
-        ?Visibility $visibility = null,
-        ?Classifier $classifier = null
-    ): self {
-        return new self($name, $arguments, $return, $visibility, $classifier);
+    public static function make(string $name): self
+    {
+        return new self($name);
     }
 
-    public function addArgument(string $name, ?string $type = null, ?string $of = null)
+    public function addArgument(string $name, ?string $type = null): self
     {
-        $argType = null;
-
-        if ($type && $of) {
-            $argType = Type::generic($type, $of);
-        } elseif ($type) {
-            $argType = Type::make($type);
-        }
-
         return new self(
             $this->name,
-            [...$this->arguments, new Argument($name, $argType)],
+            [...$this->arguments, Argument::make($name, $type)],
             $this->return,
             $this->visibility,
             $this->classifier
         );
     }
 
-    public function return(string $type, ?string $of = null): self
+    public function return(string $type): self
     {
         return new self(
             $this->name,
             $this->arguments,
-            new Type($type, $of),
+            Type::make($type),
             $this->visibility,
             $this->classifier
         );
     }
 
-    public function abstract(): self
-    {
-        return new self(
-            $this->name,
-            $this->arguments,
-            $this->return,
-            $this->visibility,
-            Classifier::ABSTRACT
-        );
-    }
-
-    public function static(): self
+    public function classifier(Classifier $classifier): self
     {
         return new self(
             $this->name,
             $this->arguments,
             $this->return,
             $this->visibility,
-            Classifier::STATIC
+            $classifier
         );
     }
 
-    public function public(): self
+    public function visibility(Visibility $visibility): self
     {
         return new self(
             $this->name,
             $this->arguments,
             $this->return,
-            Visibility::PUBLIC,
-            $this->classifier
-        );
-    }
-
-    public function protected(): self
-    {
-        return new self(
-            $this->name,
-            $this->arguments,
-            $this->return,
-            Visibility::PROTECTED,
-            $this->classifier
-        );
-    }
-
-    public function private(): self
-    {
-        return new self(
-            $this->name,
-            $this->arguments,
-            $this->return,
-            Visibility::PRIVATE,
-            $this->classifier
-        );
-    }
-
-    public function internal(): self
-    {
-        return new self(
-            $this->name,
-            $this->arguments,
-            $this->return,
-            Visibility::INTERNAL,
+            $visibility,
             $this->classifier
         );
     }

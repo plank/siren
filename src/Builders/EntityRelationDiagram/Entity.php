@@ -13,6 +13,19 @@ class Entity
     ) {
     }
 
+    public static function make(string $name): self
+    {
+        return new self($name);
+    }
+
+    public function addAttribute(Attribute $attribute): self
+    {
+        return new self(
+            $this->name,
+            [...$this->attributes, $attribute]
+        );
+    }
+
     public function __toString(): string
     {
         if (empty($this->attributes)) {
