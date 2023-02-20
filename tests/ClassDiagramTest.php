@@ -9,13 +9,12 @@ use Plank\Siren\Builders\ClassDiagram\Enums\Multiplicity;
 use Plank\Siren\Builders\ClassDiagram\Enums\Strength;
 use Plank\Siren\Builders\ClassDiagram\Enums\Visibility;
 use Plank\Siren\Builders\ClassDiagram\Exceptions\MemberException;
-use Plank\Siren\Builders\ClassDiagram\Exceptions\SymbolException;
 use Plank\Siren\Builders\ClassDiagram\Exceptions\RelationException;
+use Plank\Siren\Builders\ClassDiagram\Exceptions\SymbolException;
 use Plank\Siren\Builders\ClassDiagram\Member;
 use Plank\Siren\Builders\ClassDiagram\Method;
 use Plank\Siren\Builders\ClassDiagram\Relation;
 use Plank\Siren\Builders\ClassDiagram\Symbol;
-use Plank\Siren\Builders\Flowchart\Enums\Arrow;
 use Plank\Siren\Siren;
 
 it('can render class diagrams', function () {
@@ -404,7 +403,7 @@ it('can document itself', function () {
             ->connection($visibility, Connection::DEPENDENCY)
         )->addRelation(Relation::make($method, $classifier)
             ->connection($classifier, Connection::DEPENDENCY)
-    );
+        );
 
     expect((string) $diagram)->toBe("---\ntitle: Diagram for Siren ClassDiagram\n---\nclassDiagram\nclass ClassDiagram{\n?string title\narray symbols\narray relations\n+addSymbol(Symbol symbol) self\n+hasSymbol(Symbol symbol) bool\n+removeSymbol(Symbol symbol) self\n+addRelation(Relation relation) self\n+hasRelation(Relation relation) bool\n+removeRelation(Relation relation) self\n__toString() string\n}\n\nclass Symbol{\nstring name\narray~Member~ members\narray~Method~ methods\n?string annotation\nclass(string name, ?Modifier modifier)\$ self\ninterface(string name)\$ self\nenum(string name)\$ self\ntrait(string name)\$ self\nannotation(string annotation) self\naddMember(Member member) self\naddMethod(Method method) self\n__toString() string\n}\n\nclass Member{\nstring name\n?Type type\n?Classifier classifier\n?Visibility visibility\n+make(string name, ?string type)\$ self\n+type(string type) self\n+classifier(Classifier classifier) self\n+visibility(Visibility visibility) self\n+__toString() string\n}\n\nclass Method{\nstring name\narray arguments\n?Type return\n?Visibility visibility\n?Classifier classifier\n+make(string name)\$ self\n+addArgument(string name, ?string type) self\n+return(string type) self\n+classifier(Classifier classifier) self\n+visibility(Visibility visibility) self\n+__toString() string\n}\n\nclass Relation{\nSymbol symbolA\n?Connection connectionA\n?Multiplicity multiplicityA\nSymbol symbolB\n?Connection connectionB\n?Multiplicity multiplicityB\nStrength strength\n?string name\nmake(Symbol symbolA, Symbol symbolB)\$ self\nkey() string\nname(string name) self\nconnection(Symbol symbol, ?Connection connection) self\nmultiplicity(Symbol symbol, ?Multiplicity multiplicity) self\nstrength(Strength strength) self\n__toString() string\n}\n\nclass Type{\nstring type\n+make(string type)\$ self\n__toString() string\n}\n\nclass Argument{\nstring name\n?Type type\n+make(string name, ?string type)\$ self\n__toString() string\n}\n\nclass Classifier{\n<<enum>>\nABSTRACT\nSTATIC\n}\n\nclass Connection{\n<<enum>>\nEXTENSION\nDEPENDENCY\nCOMPOSITION\nAGGREGATION\n}\n\nclass Modifier{\n<<enum>>\nABSTRACT\nFINAL\n}\n\nclass Multiplicity{\n<<enum>>\nONLY_ONE\nZERO_OR_ONE\nONE_OR_MORE\nMANY\nN\nZERO_TO_N\nONE_TO_N\n}\n\nclass Strength{\n<<enum>>\nDEPENDENCY\nASSOCIATION\n}\n\nclass Visibility{\n<<enum>>\nPUBLIC\nPROTECTED\nPRIVATE\nINTERNAL\n}\n\nClassDiagram --o Symbol\nClassDiagram --o Relation\nRelation --> Multiplicity\nRelation --> Strength\nRelation --> Connection\nSymbol --o Member\nSymbol --> Method\nSymbol --> Modifier\nMember --> Type\nMember --> Classifier\nMember --> Visibility\nMethod --> Type\nMethod --o Argument\nMethod --> Visibility\nMethod --> Classifier\n");
 });
@@ -428,6 +427,6 @@ it('allows you specify the direction of the class diagram', function () {
         ->addSymbol($a = Symbol::class('ClassA'))
         ->addSymbol($b = Symbol::class('ClassB'))
         ->addRelation(Relation::make($a, $b)->connection($a, Connection::DEPENDENCY));
-    
+
     expect((string) $diagram)->toBe("---\ntitle: Class Diagram\n---\nclassDiagram\ndirection BT\nclass ClassA\nclass ClassB\nClassA <-- ClassB\n");
 });

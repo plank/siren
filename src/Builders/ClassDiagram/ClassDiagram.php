@@ -3,8 +3,8 @@
 namespace Plank\Siren\Builders\ClassDiagram;
 
 use Plank\Siren\Builders\ClassDiagram\Enums\Direction;
-use Plank\Siren\Builders\ClassDiagram\Exceptions\SymbolException;
 use Plank\Siren\Builders\ClassDiagram\Exceptions\RelationException;
+use Plank\Siren\Builders\ClassDiagram\Exceptions\SymbolException;
 
 class ClassDiagram
 {
@@ -86,7 +86,7 @@ class ClassDiagram
         $md .= "classDiagram\n";
 
         if ($this->direction !== Direction::TOP_DOWN) {
-            $md .= "direction ".$this->direction->value."\n";
+            $md .= 'direction '.$this->direction->value."\n";
         }
 
         foreach ($this->symbols as $symbol) {
