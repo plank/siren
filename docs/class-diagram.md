@@ -307,7 +307,7 @@ Siren::class()
     ->addSymbol($a = Symbol::class('ClassA'))
     ->addSymbol($b = Symbol::class('ClassB'))
     ->addRelation(Relation::make($a, b)
-            ->name('&copy; Relation')
+            ->name('🧜‍♀️ Relation')
             ->connection($a, Connection::AGGREGATION)
             ->multiplicity($a, Multiplicity::ONE_TO_N)
             ->strength(Strength::DEPENDENCY));
@@ -318,7 +318,7 @@ classDiagram
 direction LR
 class ClassA
 class ClassB
-ClassA "1..n" o.. ClassB : "&copy; Relation"
+ClassA "1..n" o.. ClassB : "🧜‍♀️ Relation"
 ```
 
 &nbsp;
