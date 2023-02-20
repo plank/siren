@@ -318,7 +318,7 @@ classDiagram
 direction LR
 class ClassA
 class ClassB
-ClassA "1..n" o.. ClassB : &copy; Relation
+ClassA "1..n" o.. ClassB : "&copy; Relation"
 ```
 
 &nbsp;
