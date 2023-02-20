@@ -17,17 +17,17 @@ class Flowchart
     protected Direction $direction = Direction::TOP_DOWN;
 
     /**
-     * @var  array<Flowchart>  $subgraphs
+     * @var  array<Flowchart> 
      */
     protected array $subgraphs = [];
 
     /**
-     * @var  array<Node>  $nodes
+     * @var  array<Node> 
      */
     protected array $nodes = [];
 
     /**
-     * @var  array<Link>  $links
+     * @var  array<Link> 
      */
     protected array $links = [];
 
