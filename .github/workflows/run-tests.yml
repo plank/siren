@@ -66,7 +66,7 @@ jobs:
         run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Test & publish code coverage
-        uses: paambaati/codeclimate-action@v3.2.0
+        uses: paambaati/codeclimate-action@v4.0.0
         env:
           CC_TEST_REPORTER_ID: d4b0561baafcc5f7f170d95045bc8abc0997b7c97643761c8d9d0214715a7c1b
         with:
